@@ -197,7 +197,7 @@ def do_show(cs, args):
 class CheckSizeArgForCreate(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
         if ((args.snapshot_id or args.source_volid or args.source_replica)
-                is None and values is None):
+            is None and values is None):
             parser.error('Size is a required parameter if snapshot '
                          'or source volume is not specified.')
         setattr(args, self.dest, values)
@@ -490,7 +490,7 @@ def do_metadata(cs, args):
     elif args.action == 'unset':
         # NOTE(zul): Make sure py2/py3 sorting is the same
         cs.volumes.delete_metadata(volume, sorted(metadata.keys(),
-                                   reverse=True))
+                                                  reverse=True))
 
 
 @utils.arg('volume',
@@ -505,7 +505,7 @@ def do_metadata(cs, args):
            nargs='+',
            default=[],
            help='Metadata key and value pair to set or unset. '
-           'For unset, specify only the key.')
+                'For unset, specify only the key.')
 def do_image_metadata(cs, args):
     """Sets or deletes volume image metadata."""
     volume = utils.find_volume(cs, args.volume)
@@ -515,7 +515,7 @@ def do_image_metadata(cs, args):
         cs.volumes.set_image_metadata(volume, metadata)
     elif args.action == 'unset':
         cs.volumes.delete_image_metadata(volume, sorted(metadata.keys(),
-                                         reverse=True))
+                                                        reverse=True))
 
 
 @utils.arg('--all-tenants',
@@ -621,11 +621,11 @@ def do_snapshot_show(cs, args):
            nargs='?',
            default=False,
            help='Allows or disallows snapshot of '
-           'a volume when the volume is attached to an instance. '
-           'If set to True, ignores the current status of the '
-           'volume when attempting to snapshot it rather '
-           'than forcing it to be available. '
-           'Default=False.')
+                'a volume when the volume is attached to an instance. '
+                'If set to True, ignores the current status of the '
+                'volume when attempting to snapshot it rather '
+                'than forcing it to be available. '
+                'Default=False.')
 @utils.arg('--name',
            metavar='<name>',
            default=None,
@@ -675,8 +675,8 @@ def do_snapshot_create(cs, args):
 @utils.arg('--force',
            action="store_true",
            help='Allows deleting snapshot of a volume '
-           'when its status is other than "available" or "error". '
-           'Default=False.')
+                'when its status is other than "available" or "error". '
+                'Default=False.')
 def do_snapshot_delete(cs, args):
     """Removes one or more snapshots."""
     failure_count = 0
@@ -1072,9 +1072,9 @@ def do_rate_limits(cs, args):
            nargs='?',
            default=False,
            help='Enables or disables upload of '
-           'a volume that is attached to an instance. '
-           'Default=False. '
-           'This option may not be supported by your cloud.')
+                'a volume that is attached to an instance. '
+                'Default=False. '
+                'This option may not be supported by your cloud.')
 @utils.arg('--container-format',
            metavar='<container-format>',
            default='bare',
@@ -1114,8 +1114,8 @@ def do_upload_to_image(cs, args):
            nargs='?',
            default=False,
            help='Enables or disables generic host-based '
-           'force-migration, which bypasses driver '
-           'optimizations. Default=False.')
+                'force-migration, which bypasses driver '
+                'optimizations. Default=False.')
 @utils.arg('--lock-volume', metavar='<True|False>',
            choices=['True', 'False'],
            required=False,
@@ -1123,13 +1123,13 @@ def do_upload_to_image(cs, args):
            nargs='?',
            default=False,
            help='Enables or disables the termination of volume migration '
-           'caused by other commands. This option applies to the '
-           'available volume. True means it locks the volume '
-           'state and does not allow the migration to be aborted. The '
-           'volume status will be in maintenance during the '
-           'migration. False means it allows the volume migration '
-           'to be aborted. The volume status is still in the original '
-           'status. Default=False.')
+                'caused by other commands. This option applies to the '
+                'available volume. True means it locks the volume '
+                'state and does not allow the migration to be aborted. The '
+                'volume status will be in maintenance during the '
+                'migration. False means it allows the volume migration '
+                'to be aborted. The volume status is still in the original '
+                'status. Default=False.')
 def do_migrate(cs, args):
     """Migrates volume to a new host."""
     volume = utils.find_volume(cs, args.volume)
@@ -1177,11 +1177,11 @@ def do_retype(cs, args):
 @utils.arg('--force',
            action='store_true',
            help='Allows or disallows backup of a volume '
-           'when the volume is attached to an instance. '
-           'If set to True, backs up the volume whether '
-           'its status is "available" or "in-use". The backup '
-           'of an "in-use" volume means your data is crash '
-           'consistent. Default=False.',
+                'when the volume is attached to an instance. '
+                'If set to True, backs up the volume whether '
+                'its status is "available" or "in-use". The backup '
+                'of an "in-use" volume means your data is crash '
+                'consistent. Default=False.',
            default=False)
 @utils.arg('--snapshot-id',
            metavar='<snapshot-id>',
@@ -1294,8 +1294,8 @@ def do_backup_list(cs, args):
 @utils.arg('--force',
            action="store_true",
            help='Allows deleting backup of a volume '
-           'when its status is other than "available" or "error". '
-           'Default=False.')
+                'when its status is other than "available" or "error". '
+                'Default=False.')
 @utils.arg('backup', metavar='<backup>', nargs='+',
            help='Name or ID of backup(s) to delete.')
 def do_backup_delete(cs, args):
@@ -1321,14 +1321,14 @@ def do_backup_delete(cs, args):
 @utils.arg('--volume', metavar='<volume>',
            default=None,
            help='Name or ID of existing volume to which to restore. '
-           'This is mutually exclusive with --name and takes priority. '
-           'Default=None.')
+                'This is mutually exclusive with --name and takes priority. '
+                'Default=None.')
 @utils.arg('--name', metavar='<name>',
            default=None,
            help='Use the name for new volume creation to restore. '
-           'This is mutually exclusive with --volume (or the deprecated '
-           '--volume-id) and --volume (or --volume-id) takes priority. '
-           'Default=None.')
+                'This is mutually exclusive with --volume (or the deprecated '
+                '--volume-id) and --volume (or --volume-id) takes priority. '
+                'Default=None.')
 def do_backup_restore(cs, args):
     """Restores a backup."""
     vol = args.volume or args.volume_id
@@ -1578,9 +1578,9 @@ def treeizeAvailabilityZone(zone):
                                       copy.deepcopy(zone._info), zone._loaded)
                 az.zoneName = '| |- %s' % svc
                 az.zoneState = '%s %s %s' % (
-                               'enabled' if state['active'] else 'disabled',
-                               ':-)' if state['available'] else 'XXX',
-                               state['updated_at'])
+                    'enabled' if state['active'] else 'disabled',
+                    ':-)' if state['available'] else 'XXX',
+                    state['updated_at'])
                 az._info['zoneName'] = az.zoneName
                 az._info['zoneState'] = az.zoneState
                 result.append(az)
@@ -1703,7 +1703,7 @@ def do_encryption_type_create(cs, args):
            default=argparse.SUPPRESS,
            const=None,
            help="Encryption algorithm/mode to use (e.g., aes-xts-plain64). "
-           "Provide parameter without value to set to provider default.")
+                "Provide parameter without value to set to provider default.")
 @utils.arg('--key-size',
            dest='key_size',
            metavar='<key-size>',
@@ -1713,7 +1713,7 @@ def do_encryption_type_create(cs, args):
            default=argparse.SUPPRESS,
            const=None,
            help="Size of the encryption key, in bits (e.g., 128, 256). "
-           "Provide parameter without value to set to provider default. ")
+                "Provide parameter without value to set to provider default. ")
 @utils.arg('--control-location',
            dest='control_location',
            metavar='<control-location>',
@@ -1722,7 +1722,7 @@ def do_encryption_type_create(cs, args):
            required=False,
            default=argparse.SUPPRESS,
            help="Notional service where encryption is performed (e.g., "
-           "front-end=Nova). Values: 'front-end', 'back-end'")
+                "front-end=Nova). Values: 'front-end', 'back-end'")
 def do_encryption_type_update(cs, args):
     """Update encryption type information for a volume type (Admin Only)."""
     volume_type = shell_utils.find_volume_type(cs, args.volume_type)
@@ -2516,3 +2516,110 @@ def do_snapshot_manageable_list(cs, args):
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
     utils.print_list(snapshots, columns, sortby_index=None)
+
+
+
+
+
+def do_storage_list(cs, args):
+    storages = cs.storages.list(detailed=False)
+    columns = ['id', 'storage_name', 'user_id', 'deleted', 'deleted_at', 'created_at', 'updated_at', 'storage_device']
+    utils.print_list(storages, columns)
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='Name or ID of the storage.')
+@utils.arg('--detail',
+           action='store_true',
+           help='Show detailed information about storage.')
+def do_storage_show(cs, args):
+    """Show volume type details."""
+    detailed = strutils.bool_from_string(args.detail)
+    storage = cs.storages.get(args.id, detailed)
+    info = dict()
+    info.update(storage._info)
+    utils.print_dict(info, formatters=['pool_info', 'metadatas'])
+
+
+@utils.arg('--device_name',
+           metavar='<device_name>',
+           help='Name of new storage device.')
+@utils.arg('--device_type',
+           metavar='<device_type>',
+           help='Type of new storage device.')
+@utils.arg('--device_version',
+           metavar='<device_version>',
+           default=None,
+           help='Make type accessible to the public (default true).')
+@utils.arg('--comment',
+           metavar='<comment>',
+           default=None,
+           help='Make type accessible to the public (default true).')
+def do_storage_device_create(cs, args):
+    device = cs.storage_devices.create(args.device_name, args.device_type, args.device_version, args.comment)
+    utils.print_dict(device._info)
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='Id of storage device')
+@utils.arg('--device_name',
+           metavar='<device_name>',
+           help='Name of new storage device.')
+@utils.arg('--device_type',
+           metavar='<device_type>',
+           help='Type of new storage device.')
+@utils.arg('--device_version',
+           metavar='<device_version>',
+           default=None,
+           help='Version of new storage device.')
+@utils.arg('--comment',
+           metavar='<comment>',
+           default=None,
+           help='The description of new storage device.')
+def do_storage_device_update(cs, args):
+    device = cs.storage_devices.update(args.id, args.device_name, args.device_type, args.device_version, args.comment)
+    utils.print_dict(device._info)
+
+
+def do_storage_device_list(cs, args):
+    devices = cs.storage_devices.list()
+    utils.print_list(devices,
+                     ['id', 'device_name', 'device_version', 'device_type',
+                      'comment', 'deleted', 'deleted_at', 'created_at', 'updated_at'])
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='Name or ID of the storage device.')
+def do_storage_device_show(cs, args):
+    device = cs.storage_devices.get(args.id)
+    utils.print_dict(device._info)
+
+
+@utils.arg('devices',
+           metavar='<devices>', nargs='+',
+           help='ID of storage device or devices to delete.')
+def do_storage_device_delete(cs, args):
+    """Removes one or more volumes."""
+    failure_count = 0
+    for device in args.devices:
+        try:
+            cs.storage_devices.delete(device)
+            print("Request to delete storage device %s has been accepted." % (device))
+        except Exception as e:
+            failure_count += 1
+            print("Delete for storage device %s failed: %s" % (device, e))
+    if failure_count == len(args.devices):
+        raise exceptions.CommandError("Unable to delete any of the specified "
+                                      "volumes.")
+
+@utils.arg('--storage_id',
+           metavar='<storage_id>',
+           help='id of the storage.')
+def do_storage_metadata_show(cs, args):
+    metadatas = cs.storage_metadata.get(args.storage_id)
+    utils.print_dict(metadatas._info)
+
+
