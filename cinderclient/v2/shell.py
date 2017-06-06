@@ -2519,7 +2519,11 @@ def do_snapshot_manageable_list(cs, args):
 
 
 
-
+"""
+    storage manage commands
+    created by handsome wangyue
+    date:2017-6-6
+"""
 
 def do_storage_list(cs, args):
     storages = cs.storages.list(detailed=False)
@@ -2612,8 +2616,8 @@ def do_storage_device_delete(cs, args):
             failure_count += 1
             print("Delete for storage device %s failed: %s" % (device, e))
     if failure_count == len(args.devices):
-        raise exceptions.CommandError("Unable to delete any of the specified "
-                                      "volumes.")
+        raise exceptions.CommandError("Unable to delete any of the specified storage device.")
+
 
 @utils.arg('--storage_id',
            metavar='<storage_id>',
@@ -2623,3 +2627,75 @@ def do_storage_metadata_show(cs, args):
     utils.print_dict(metadatas._info)
 
 
+@utils.arg('--storage_name',
+           metavar='<storage_name>',
+           help='Name of new storage.')
+@utils.arg('--storage_device',
+           metavar='<storage_device>',
+           help='Storage device id of new storage.')
+@utils.arg('--metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           help='Metadata key and value pairs. Default=None.')
+def do_storage_create(cs, args):
+    storage_metadata = None
+    if args.metadata is not None:
+        storage_metadata = shell_utils.extract_metadata(args)
+
+    storage = cs.storages.create(args.storage_name, args.storage_device, storage_metadata)
+    utils.print_dict(storage._info)
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='Id of storage')
+@utils.arg('--storage_name',
+           metavar='<storage_name>',
+           help='Name of storage.')
+@utils.arg('--storage_device',
+           metavar='<storage_device>',
+           help='Storage device id of storage.')
+@utils.arg('--metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           help='Metadata key and value pairs. Default=None.')
+def do_storage_update(cs, args):
+    storage_metadata = None
+    if args.metadata is not None:
+        storage_metadata = shell_utils.extract_metadata(args)
+
+    storage = cs.storages.update(args.id, args.storage_name, args.storage_device, storage_metadata)
+    utils.print_dict(storage._info)
+
+
+@utils.arg('storages',
+           metavar='<storages>', nargs='+',
+           help='ID of storage or storages to delete.')
+def do_storage_delete(cs, args):
+    """Removes one or more volumes."""
+    failure_count = 0
+    for storage in args.storages:
+        try:
+            cs.storages.delete(storage)
+            print("Request to delete storage %s has been accepted." % (storage))
+        except Exception as e:
+            failure_count += 1
+            print("Delete for storage %s failed: %s" % (storage, e))
+    if failure_count == len(args.storages):
+        raise exceptions.CommandError("Unable to delete any of the specified storage.")
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='ID of storage to reconfig.')
+def do_storage_reconfig(cs, args):
+    """Removes one or more volumes."""
+    try:
+        cs.storages.reconfig(args.id)
+        print("Request to reconfig storage %s has been accepted." % (args.id))
+    except Exception as e:
+        print("Reconfig for storage %s failed: %s" % (args.id, e))

@@ -43,3 +43,30 @@ class StoragesManager(base.Manager):
         storage = self._get("/storages/{storage_id}?detail={detailed}".format(storage_id=storage_id, detailed=detailed),
                             'storage')
         return storage
+
+    def create(self, storage_name, storage_device, metadata):
+        body = {
+            "storage": {
+                "storage_name": storage_name,
+                "storage_device": storage_device,
+                "metadatas": metadata
+            }
+        }
+        return self._create('/storages', body, 'storage')
+
+    def update(self, storage_id, storage_name, storage_device, metadata):
+        body = {
+            "storage": {
+                "storage_name": storage_name,
+                "storage_device": storage_device,
+                "metadatas": metadata
+            }
+        }
+        return self._update('/storages/%s' % storage_id, body, 'storage')
+
+    def delete(self, storage_id):
+        return self._delete("/storages/%s" % storage_id)
+
+    def reconfig(self, storage_id):
+        resp, body = self.api.client.get("/storages/%s/reconfig" % storage_id)
+        return body
