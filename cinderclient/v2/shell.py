@@ -197,7 +197,7 @@ def do_show(cs, args):
 class CheckSizeArgForCreate(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
         if ((args.snapshot_id or args.source_volid or args.source_replica)
-            is None and values is None):
+                is None and values is None):
             parser.error('Size is a required parameter if snapshot '
                          'or source volume is not specified.')
         setattr(args, self.dest, values)
@@ -490,7 +490,7 @@ def do_metadata(cs, args):
     elif args.action == 'unset':
         # NOTE(zul): Make sure py2/py3 sorting is the same
         cs.volumes.delete_metadata(volume, sorted(metadata.keys(),
-                                                  reverse=True))
+                                   reverse=True))
 
 
 @utils.arg('volume',
@@ -505,7 +505,7 @@ def do_metadata(cs, args):
            nargs='+',
            default=[],
            help='Metadata key and value pair to set or unset. '
-                'For unset, specify only the key.')
+           'For unset, specify only the key.')
 def do_image_metadata(cs, args):
     """Sets or deletes volume image metadata."""
     volume = utils.find_volume(cs, args.volume)
@@ -515,7 +515,7 @@ def do_image_metadata(cs, args):
         cs.volumes.set_image_metadata(volume, metadata)
     elif args.action == 'unset':
         cs.volumes.delete_image_metadata(volume, sorted(metadata.keys(),
-                                                        reverse=True))
+                                         reverse=True))
 
 
 @utils.arg('--all-tenants',
@@ -621,11 +621,11 @@ def do_snapshot_show(cs, args):
            nargs='?',
            default=False,
            help='Allows or disallows snapshot of '
-                'a volume when the volume is attached to an instance. '
-                'If set to True, ignores the current status of the '
-                'volume when attempting to snapshot it rather '
-                'than forcing it to be available. '
-                'Default=False.')
+           'a volume when the volume is attached to an instance. '
+           'If set to True, ignores the current status of the '
+           'volume when attempting to snapshot it rather '
+           'than forcing it to be available. '
+           'Default=False.')
 @utils.arg('--name',
            metavar='<name>',
            default=None,
@@ -675,8 +675,8 @@ def do_snapshot_create(cs, args):
 @utils.arg('--force',
            action="store_true",
            help='Allows deleting snapshot of a volume '
-                'when its status is other than "available" or "error". '
-                'Default=False.')
+           'when its status is other than "available" or "error". '
+           'Default=False.')
 def do_snapshot_delete(cs, args):
     """Removes one or more snapshots."""
     failure_count = 0
@@ -1072,9 +1072,9 @@ def do_rate_limits(cs, args):
            nargs='?',
            default=False,
            help='Enables or disables upload of '
-                'a volume that is attached to an instance. '
-                'Default=False. '
-                'This option may not be supported by your cloud.')
+           'a volume that is attached to an instance. '
+           'Default=False. '
+           'This option may not be supported by your cloud.')
 @utils.arg('--container-format',
            metavar='<container-format>',
            default='bare',
@@ -1114,8 +1114,8 @@ def do_upload_to_image(cs, args):
            nargs='?',
            default=False,
            help='Enables or disables generic host-based '
-                'force-migration, which bypasses driver '
-                'optimizations. Default=False.')
+           'force-migration, which bypasses driver '
+           'optimizations. Default=False.')
 @utils.arg('--lock-volume', metavar='<True|False>',
            choices=['True', 'False'],
            required=False,
@@ -1123,13 +1123,13 @@ def do_upload_to_image(cs, args):
            nargs='?',
            default=False,
            help='Enables or disables the termination of volume migration '
-                'caused by other commands. This option applies to the '
-                'available volume. True means it locks the volume '
-                'state and does not allow the migration to be aborted. The '
-                'volume status will be in maintenance during the '
-                'migration. False means it allows the volume migration '
-                'to be aborted. The volume status is still in the original '
-                'status. Default=False.')
+           'caused by other commands. This option applies to the '
+           'available volume. True means it locks the volume '
+           'state and does not allow the migration to be aborted. The '
+           'volume status will be in maintenance during the '
+           'migration. False means it allows the volume migration '
+           'to be aborted. The volume status is still in the original '
+           'status. Default=False.')
 def do_migrate(cs, args):
     """Migrates volume to a new host."""
     volume = utils.find_volume(cs, args.volume)
@@ -1177,11 +1177,11 @@ def do_retype(cs, args):
 @utils.arg('--force',
            action='store_true',
            help='Allows or disallows backup of a volume '
-                'when the volume is attached to an instance. '
-                'If set to True, backs up the volume whether '
-                'its status is "available" or "in-use". The backup '
-                'of an "in-use" volume means your data is crash '
-                'consistent. Default=False.',
+           'when the volume is attached to an instance. '
+           'If set to True, backs up the volume whether '
+           'its status is "available" or "in-use". The backup '
+           'of an "in-use" volume means your data is crash '
+           'consistent. Default=False.',
            default=False)
 @utils.arg('--snapshot-id',
            metavar='<snapshot-id>',
@@ -1294,8 +1294,8 @@ def do_backup_list(cs, args):
 @utils.arg('--force',
            action="store_true",
            help='Allows deleting backup of a volume '
-                'when its status is other than "available" or "error". '
-                'Default=False.')
+           'when its status is other than "available" or "error". '
+           'Default=False.')
 @utils.arg('backup', metavar='<backup>', nargs='+',
            help='Name or ID of backup(s) to delete.')
 def do_backup_delete(cs, args):
