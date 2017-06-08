@@ -41,7 +41,9 @@ from cinderclient.v3 import volume_encryption_types
 from cinderclient.v3 import volume_backups
 from cinderclient.v3 import volume_backups_restore
 from cinderclient.v3 import volume_transfers
-
+from cinderclient.v2 import storages
+from cinderclient.v2 import storage_devices
+from cinderclient.v2 import storage_metadata
 
 class Client(object):
     """Top-level object to access the OpenStack Volume API.
@@ -100,6 +102,10 @@ class Client(object):
         self.capabilities = capabilities.CapabilitiesManager(self)
         self.attachments = \
             attachments.VolumeAttachmentManager(self)
+
+        self.storages = storages.StoragesManager(self)
+        self.storage_devices = storage_devices.StorageDevicesManager(self)
+        self.storage_metadata = storage_metadata.StorageMetadataManager(self)
 
         # Add in any extensions...
         if extensions:
