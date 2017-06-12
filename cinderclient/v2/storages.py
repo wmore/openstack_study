@@ -33,7 +33,7 @@ class StoragesManager(base.Manager):
         :rtype: list of :class:`Pool`
         """
         if detailed is True:
-            storages = self._list("/storages?detail=True", 'storages')
+            storages = self._list("/storages?detail=true", 'storages')
             return storages
         else:
             storages = self._list("/storages", "storages")
@@ -44,12 +44,14 @@ class StoragesManager(base.Manager):
                             'storage')
         return storage
 
-    def create(self, storage_name, storage_device, metadata):
+    def create(self, storage_name, storage_device, metadata, usage, nova_aggregate_id):
         body = {
             "storage": {
                 "storage_name": storage_name,
                 "storage_device": storage_device,
-                "metadatas": metadata
+                "metadatas": metadata,
+                "usage": usage,
+                "nova_aggregate_id": nova_aggregate_id
             }
         }
         return self._create('/storages', body, 'storage')

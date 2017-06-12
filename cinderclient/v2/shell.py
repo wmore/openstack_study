@@ -2518,16 +2518,11 @@ def do_snapshot_manageable_list(cs, args):
     utils.print_list(snapshots, columns, sortby_index=None)
 
 
-
-"""
-    storage manage commands
-    created by handsome wangyue
-    date:2017-6-6
-"""
-
 def do_storage_list(cs, args):
+    """Show all volume storages without metadata and pool info."""
     storages = cs.storages.list(detailed=False)
-    columns = ['id', 'storage_name', 'user_id', 'deleted', 'deleted_at', 'created_at', 'updated_at', 'storage_device']
+    columns = ['id', 'storage_name', 'user_id', 'deleted', 'deleted_at',
+               'created_at', 'updated_at', 'storage_device', 'usage', 'nova_aggregate_id']
     utils.print_list(storages, columns)
 
 
@@ -2538,7 +2533,7 @@ def do_storage_list(cs, args):
            action='store_true',
            help='Show detailed information about storage.')
 def do_storage_show(cs, args):
-    """Show volume type details."""
+    """Show volume storage details."""
     detailed = strutils.bool_from_string(args.detail)
     storage = cs.storages.get(args.id, detailed)
     info = dict()
@@ -2555,12 +2550,13 @@ def do_storage_show(cs, args):
 @utils.arg('--device_version',
            metavar='<device_version>',
            default=None,
-           help='Make type accessible to the public (default true).')
+           help='Version of new storage device.')
 @utils.arg('--comment',
            metavar='<comment>',
            default=None,
-           help='Make type accessible to the public (default true).')
+           help='The description of new storage device.')
 def do_storage_device_create(cs, args):
+    """Create a storage device."""
     device = cs.storage_devices.create(args.device_name, args.device_type, args.device_version, args.comment)
     utils.print_dict(device._info)
 
@@ -2583,11 +2579,13 @@ def do_storage_device_create(cs, args):
            default=None,
            help='The description of new storage device.')
 def do_storage_device_update(cs, args):
+    """update a storage device"""
     device = cs.storage_devices.update(args.id, args.device_name, args.device_type, args.device_version, args.comment)
     utils.print_dict(device._info)
 
 
 def do_storage_device_list(cs, args):
+    """Show all storage devices."""
     devices = cs.storage_devices.list()
     utils.print_list(devices,
                      ['id', 'device_name', 'device_version', 'device_type',
@@ -2598,6 +2596,7 @@ def do_storage_device_list(cs, args):
            metavar='<id>',
            help='Name or ID of the storage device.')
 def do_storage_device_show(cs, args):
+    """Show a storage device."""
     device = cs.storage_devices.get(args.id)
     utils.print_dict(device._info)
 
@@ -2606,7 +2605,7 @@ def do_storage_device_show(cs, args):
            metavar='<devices>', nargs='+',
            help='ID of storage device or devices to delete.')
 def do_storage_device_delete(cs, args):
-    """Removes one or more volumes."""
+    """Removes one or more storage device."""
     failure_count = 0
     for device in args.devices:
         try:
@@ -2621,8 +2620,9 @@ def do_storage_device_delete(cs, args):
 
 @utils.arg('--storage_id',
            metavar='<storage_id>',
-           help='id of the storage.')
+           help='Id of the storage.')
 def do_storage_metadata_show(cs, args):
+    """Show metadatas of one volume storage."""
     metadatas = cs.storage_metadata.get(args.storage_id)
     utils.print_dict(metadatas._info)
 
@@ -2639,12 +2639,20 @@ def do_storage_metadata_show(cs, args):
            metavar='<key=value>',
            default=None,
            help='Metadata key and value pairs. Default=None.')
+@utils.arg('--usage',
+           metavar='<usage>',
+           help='Usage of new storage. system/data')
+@utils.arg('--nova_aggregate_id',
+           metavar='<nova_aggregate_id>',
+           help='Aggregate id. It can not be blank if arg `usage` is system')
 def do_storage_create(cs, args):
+    """Create a volume storage."""
     storage_metadata = None
     if args.metadata is not None:
         storage_metadata = shell_utils.extract_metadata(args)
 
-    storage = cs.storages.create(args.storage_name, args.storage_device, storage_metadata)
+    storage = cs.storages.create(args.storage_name, args.storage_device, storage_metadata,
+                                 args.usage, args.nova_aggregate_id)
     utils.print_dict(storage._info)
 
 
@@ -2664,6 +2672,7 @@ def do_storage_create(cs, args):
            default=None,
            help='Metadata key and value pairs. Default=None.')
 def do_storage_update(cs, args):
+    """Update a volume storage."""
     storage_metadata = None
     if args.metadata is not None:
         storage_metadata = shell_utils.extract_metadata(args)
@@ -2693,7 +2702,7 @@ def do_storage_delete(cs, args):
            metavar='<id>',
            help='ID of storage to reconfig.')
 def do_storage_reconfig(cs, args):
-    """Removes one or more volumes."""
+    """Set the configuration of volume storage and restart kolla container."""
     try:
         cs.storages.reconfig(args.id)
         print("Request to reconfig storage %s has been accepted." % (args.id))
