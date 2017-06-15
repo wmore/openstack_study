@@ -28,16 +28,16 @@ class StorageDeviceTypesManager(base.Manager):
     resource_class = StorageDeviceTypes
 
     def list(self):
-        devices = self._list("/os-storage-device-type", 'devices')
+        devices = self._list("/os-storage-device-type", 'device_types')
         return devices
 
     def get(self, type_id):
-        device = self._get("/os-storage-device-type/%s" % type_id, 'device')
+        device = self._get("/os-storage-device-type/%s" % type_id, 'device_type')
         return device
 
     def create(self, device_type_name, vendor, device_version=None, comment=None):
         body = {
-            "device": {
+            "device_type": {
                 "device_type_name": device_type_name,
                 "device_version": device_version,
                 "vendor": vendor,
@@ -45,28 +45,28 @@ class StorageDeviceTypesManager(base.Manager):
             }
         }
 
-        return self._create("/os-storage-device-type", body, "device")
+        return self._create("/os-storage-device-type", body, "device_type")
 
     def update(self, device_id, device_type_name=None, vendor=None, device_version=None, comment=None):
         body = {
-            "device": {
+            "device_type": {
             }
         }
 
         if device_type_name is not None:
-            body['device']['device_type_name'] = device_type_name
+            body['device_type']['device_type_name'] = device_type_name
 
         if vendor is not None:
-            body['device']['vendor'] = vendor
+            body['device_type']['vendor'] = vendor
 
         if device_version is not None:
-            body['device']['device_version'] = vendor
+            body['device_type']['device_version'] = vendor
 
         if comment is not None:
-            body['device']['comment'] = vendor
+            body['device_type']['comment'] = vendor
 
         return self._update("/os-storage-device-type/%s" % device_id,
-                            body, response_key="device")
+                            body, response_key="device_type")
 
     def delete(self, device_id):
         return self._delete("/os-storage-device-type/%s" % device_id)
