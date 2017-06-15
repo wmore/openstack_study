@@ -24,14 +24,9 @@ class Storages(base.Resource):
 
 
 class StoragesManager(base.Manager):
-    """Manage :class:`Pool` resources."""
     resource_class = Storages
 
     def list(self, detailed=False):
-        """Lists all
-
-        :rtype: list of :class:`Pool`
-        """
         if detailed is True:
             storages = self._list("/storages?detail=true", 'storages')
             return storages
@@ -40,15 +35,16 @@ class StoragesManager(base.Manager):
             return storages
 
     def get(self, storage_id, detailed=False):
-        storage = self._get("/storages/{storage_id}?detail={detailed}".format(storage_id=storage_id, detailed=detailed),
+        storage = self._get("/storages/{storage_id}?detail={detailed}".
+                            format(storage_id=storage_id, detailed=detailed),
                             'storage')
         return storage
 
-    def create(self, storage_name, storage_device, metadata, usage, nova_aggregate_id):
+    def create(self, storage_name, device_id, metadata, usage, nova_aggregate_id):
         body = {
             "storage": {
                 "storage_name": storage_name,
-                "storage_device": storage_device,
+                "device_id": device_id,
                 "metadatas": metadata,
                 "usage": usage,
                 "nova_aggregate_id": nova_aggregate_id
@@ -56,14 +52,17 @@ class StoragesManager(base.Manager):
         }
         return self._create('/storages', body, 'storage')
 
-    def update(self, storage_id, storage_name, storage_device, metadata):
+    def update(self, storage_id, storage_name=None, device_id=None, metadatas=None):
         body = {
             "storage": {
-                "storage_name": storage_name,
-                "storage_device": storage_device,
-                "metadatas": metadata
             }
         }
+        if storage_name is not None:
+            body['storage']['storage_name'] = storage_name
+        if device_id is not None:
+            body['storage']['device_id'] = device_id
+        if metadatas is not None:
+            body['storage']['metadatas'] = metadatas
         return self._update('/storages/%s' % storage_id, body, 'storage')
 
     def delete(self, storage_id):

@@ -2521,8 +2521,8 @@ def do_snapshot_manageable_list(cs, args):
 def do_storage_list(cs, args):
     """Show all volume storages without metadata and pool info."""
     storages = cs.storages.list(detailed=False)
-    columns = ['id', 'storage_name', 'user_id', 'deleted', 'deleted_at',
-               'created_at', 'updated_at', 'storage_device', 'usage', 'nova_aggregate_id']
+    columns = ['id', 'storage_name', 'device_id', 'usage', 'nova_aggregate_id',
+               'user_id', 'created_at', 'updated_at']
     utils.print_list(storages, columns)
 
 
@@ -2541,81 +2541,82 @@ def do_storage_show(cs, args):
     utils.print_dict(info, formatters=['pool_info', 'metadatas'])
 
 
-@utils.arg('--device_name',
-           metavar='<device_name>',
-           help='Name of new storage device.')
-@utils.arg('--device_type',
-           metavar='<device_type>',
-           help='Type of new storage device.')
+@utils.arg('--device_type_name',
+           metavar='<device_type_name>',
+           help='Name of new storage device type.')
+@utils.arg('--vendor',
+           metavar='<vendor>',
+           help='Type of new storage device type.')
 @utils.arg('--device_version',
            metavar='<device_version>',
            default=None,
-           help='Version of new storage device.')
+           help='Version of new storage device type.')
 @utils.arg('--comment',
            metavar='<comment>',
            default=None,
-           help='The description of new storage device.')
-def do_storage_device_create(cs, args):
-    """Create a storage device."""
-    device = cs.storage_devices.create(args.device_name, args.device_type, args.device_version, args.comment)
+           help='The description of new storage device type.')
+def do_storage_device_type_create(cs, args):
+    """Create a storage device type."""
+    device = cs.storage_device_types.create(args.device_type_name, args.vendor, args.device_version, args.comment)
     utils.print_dict(device._info)
 
 
 @utils.arg('id',
            metavar='<id>',
-           help='Id of storage device')
-@utils.arg('--device_name',
-           metavar='<device_name>',
-           help='Name of new storage device.')
-@utils.arg('--device_type',
-           metavar='<device_type>',
-           help='Type of new storage device.')
+           help='Id of storage device type')
+@utils.arg('--device_type_name',
+           metavar='<device_type_name>',
+           help='Name of new storage device type.')
+@utils.arg('--vendor',
+           metavar='<vendor>',
+           help='Type of new storage device type.')
 @utils.arg('--device_version',
            metavar='<device_version>',
            default=None,
-           help='Version of new storage device.')
+           help='Version of new storage device type.')
 @utils.arg('--comment',
            metavar='<comment>',
            default=None,
            help='The description of new storage device.')
-def do_storage_device_update(cs, args):
-    """update a storage device"""
-    device = cs.storage_devices.update(args.id, args.device_name, args.device_type, args.device_version, args.comment)
+def do_storage_device_type_update(cs, args):
+    """update a storage device type"""
+    device = cs.storage_device_types.update(args.id, args.device_type_name, args.vendor, args.device_version,
+                                            args.comment)
     utils.print_dict(device._info)
 
 
-def do_storage_device_list(cs, args):
-    """Show all storage devices."""
-    devices = cs.storage_devices.list()
+def do_storage_device_type_list(cs, args):
+    """Show all storage device types."""
+    devices = cs.storage_device_types.list()
     utils.print_list(devices,
-                     ['id', 'device_name', 'device_version', 'device_type',
+                     ['id', 'device_type_name', 'device_version', 'vendor',
                       'comment', 'deleted', 'deleted_at', 'created_at', 'updated_at'])
 
 
 @utils.arg('id',
            metavar='<id>',
-           help='Name or ID of the storage device.')
-def do_storage_device_show(cs, args):
-    """Show a storage device."""
-    device = cs.storage_devices.get(args.id)
+           help='Name or ID of the storage device type.')
+def do_storage_device_type_show(cs, args):
+    """Show a storage device type."""
+    device = cs.storage_device_types.get(args.id)
     utils.print_dict(device._info)
 
 
-@utils.arg('devices',
-           metavar='<devices>', nargs='+',
-           help='ID of storage device or devices to delete.')
-def do_storage_device_delete(cs, args):
-    """Removes one or more storage device."""
+@utils.arg('device_types',
+           metavar='<device_types>', nargs='+',
+           help='ID of storage device type or types to delete.')
+def do_storage_device_type_delete(cs, args):
+    """Removes one or more storage device type."""
     failure_count = 0
-    for device in args.devices:
+    for t in args.device_types:
         try:
-            cs.storage_devices.delete(device)
-            print("Request to delete storage device %s has been accepted." % (device))
+            cs.storage_device_types.delete(t)
+            print("Request to delete storage device type %s has been accepted." % (t))
         except Exception as e:
             failure_count += 1
-            print("Delete for storage device %s failed: %s" % (device, e))
-    if failure_count == len(args.devices):
-        raise exceptions.CommandError("Unable to delete any of the specified storage device.")
+            print("Delete for storage device type %s failed: %s" % (t, e))
+    if failure_count == len(args.device_types):
+        raise exceptions.CommandError("Unable to delete any of the specified storage device type.")
 
 
 @utils.arg('--storage_id',
@@ -2630,8 +2631,8 @@ def do_storage_metadata_show(cs, args):
 @utils.arg('--storage_name',
            metavar='<storage_name>',
            help='Name of new storage.')
-@utils.arg('--storage_device',
-           metavar='<storage_device>',
+@utils.arg('--device_id',
+           metavar='<device_id>',
            help='Storage device id of new storage.')
 @utils.arg('--metadata',
            type=str,
@@ -2651,7 +2652,7 @@ def do_storage_create(cs, args):
     if args.metadata is not None:
         storage_metadata = shell_utils.extract_metadata(args)
 
-    storage = cs.storages.create(args.storage_name, args.storage_device, storage_metadata,
+    storage = cs.storages.create(args.storage_name, args.device_id, storage_metadata,
                                  args.usage, args.nova_aggregate_id)
     utils.print_dict(storage._info)
 
@@ -2662,8 +2663,8 @@ def do_storage_create(cs, args):
 @utils.arg('--storage_name',
            metavar='<storage_name>',
            help='Name of storage.')
-@utils.arg('--storage_device',
-           metavar='<storage_device>',
+@utils.arg('--device_id',
+           metavar='<device_id>',
            help='Storage device id of storage.')
 @utils.arg('--metadata',
            type=str,
@@ -2677,7 +2678,7 @@ def do_storage_update(cs, args):
     if args.metadata is not None:
         storage_metadata = shell_utils.extract_metadata(args)
 
-    storage = cs.storages.update(args.id, args.storage_name, args.storage_device, storage_metadata)
+    storage = cs.storages.update(args.id, args.storage_name, args.device_id, storage_metadata)
     utils.print_dict(storage._info)
 
 
@@ -2708,3 +2709,114 @@ def do_storage_reconfig(cs, args):
         print("Request to reconfig storage %s has been accepted." % (args.id))
     except Exception as e:
         print("Reconfig for storage %s failed: %s" % (args.id, e))
+
+
+@utils.arg('--device_name',
+           metavar='<device_name>',
+           help='Name of new storage device.')
+@utils.arg('--device_type_id',
+           metavar='<device_type_id>',
+           help='Type of new storage device.')
+@utils.arg('--use_driver',
+           metavar='<use_driver>',
+           type=bool,
+           default=False,
+           help='User driver or not.')
+@utils.arg('--protocol',
+           metavar='<protocol>',
+           default=None,
+           help='The protocol of new storage device.')
+@utils.arg('--controller_ip',
+           metavar='<controller_ip>',
+           default=None,
+           help='The controller_ip of new storage device.')
+@utils.arg('--user_name',
+           metavar='<user_name>',
+           default=None,
+           help='The user_name of new storage device.')
+@utils.arg('--password',
+           metavar='<password>',
+           default=None,
+           help='The password of new storage device.')
+def do_storage_device_create(cs, args):
+    """Create a storage device."""
+    device = cs.storage_device.create(args.device_name, args.device_type_id, args.protocol,
+                                      args.use_driver, args.controller_ip, args.user_name,
+                                      args.password)
+    utils.print_dict(device._info)
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='Id of storage device')
+@utils.arg('--device_name',
+           metavar='<device_name>',
+           help='Name of new storage device.')
+@utils.arg('--device_type_id',
+           metavar='<device_type_id>',
+           help='Type of new storage device.')
+@utils.arg('--use_driver',
+           metavar='<use_driver>',
+           type=bool,
+           default=False,
+           help='User driver or not.')
+@utils.arg('--protocol',
+           metavar='<protocol>',
+           default=None,
+           help='The protocol of new storage device.')
+@utils.arg('--controller_ip',
+           metavar='<controller_ip>',
+           default=None,
+           help='The controller_ip of new storage device.')
+@utils.arg('--user_name',
+           metavar='<user_name>',
+           default=None,
+           help='The user_name of new storage device.')
+@utils.arg('--password',
+           metavar='<password>',
+           default=None,
+           help='The password of new storage device.')
+def do_storage_device_update(cs, args):
+    """update a storage device"""
+    device = cs.storage_device.update(args.id, args.device_name, args.device_type_id, args.protocol,
+                                      args.use_driver, args.controller_ip, args.user_name,
+                                      args.password)
+    utils.print_dict(device._info)
+
+
+@utils.arg('--device_name',
+           metavar='<device_name>',
+           default='',
+           help='Name of new storage device.')
+def do_storage_device_list(cs, args):
+    """Show all storage devices."""
+    devices = cs.storage_device.list(args.device_name)
+    utils.print_list(devices,
+                     ['id', 'device_name', 'device_type_id', 'protocol',
+                      'use_driver', 'controller_ip', 'user_name', 'password'])
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='Name or ID of the storage device.')
+def do_storage_device_show(cs, args):
+    """Show a storage device."""
+    device = cs.storage_device.get(args.id)
+    utils.print_dict(device._info)
+
+
+@utils.arg('devices',
+           metavar='<devices>', nargs='+',
+           help='ID of storage device or devices to delete.')
+def do_storage_device_delete(cs, args):
+    """Removes one or more storage device."""
+    failure_count = 0
+    for device in args.devices:
+        try:
+            cs.storage_device.delete(device)
+            print("Request to delete storage device %s has been accepted." % (device))
+        except Exception as e:
+            failure_count += 1
+            print("Delete for storage device %s failed: %s" % (device, e))
+    if failure_count == len(args.devices):
+        raise exceptions.CommandError("Unable to delete any of the specified storage device.")
