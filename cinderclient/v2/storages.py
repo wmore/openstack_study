@@ -26,13 +26,30 @@ class Storages(base.Resource):
 class StoragesManager(base.Manager):
     resource_class = Storages
 
-    def list(self, detailed=False):
+    def list(self, storage_name=None, device_id=None,
+             volume_backend_name=None, usage=None, nova_aggregate_id=None,
+             status=None, detailed=False):
+        url = '/storages'
+        filters = []
+        if storage_name:
+            filters.append('storage_name={0}'.format(storage_name))
+        if device_id:
+            filters.append('device_id={0}'.format(device_id))
+        if volume_backend_name:
+            filters.append('volume_backend_name={0}'.volume_backend_name(storage_name))
+        if usage:
+            filters.append('usage={0}'.format(usage))
+        if nova_aggregate_id:
+            filters.append('nova_aggregate_id={0}'.format(nova_aggregate_id))
+        if status:
+            filters.append('status={0}'.format(status))
         if detailed is True:
-            storages = self._list("/storages?detail=true", 'storages')
-            return storages
-        else:
-            storages = self._list("/storages", "storages")
-            return storages
+            filters.append('detail=true')
+        if len(filters) > 0:
+            str_filters = '&'.join(filters)
+            url = url + '?' + str_filters
+        storages = self._list(url, 'storages')
+        return storages
 
     def get(self, storage_id, detailed=False):
         storage = self._get("/storages/{storage_id}?detail={detailed}".

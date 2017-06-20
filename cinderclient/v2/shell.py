@@ -2518,11 +2518,30 @@ def do_snapshot_manageable_list(cs, args):
     utils.print_list(snapshots, columns, sortby_index=None)
 
 
+@utils.arg('--storage_name',
+           metavar='<storage_name>',
+           help='Name of storage, support fuzzy query.')
+@utils.arg('--device_id',
+           metavar='<device_id>',
+           help='Storage device id of storage.')
+@utils.arg('--volume_backend_name',
+           metavar='<volume_backend_name>',
+           help='volume_backend_name of storage.')
+@utils.arg('--usage',
+           metavar='<usage>',
+           help='Usage of storage. system/data')
+@utils.arg('--nova_aggregate_id',
+           metavar='<nova_aggregate_id>',
+           help='Aggregate id. It can not be blank if arg `usage` is system')
+@utils.arg('--status',
+           metavar='<status>',
+           help='The status of storage')
 def do_storage_list(cs, args):
     """Show all volume storages without metadata and pool info."""
-    storages = cs.storages.list(detailed=False)
+    storages = cs.storages.list(args.storage_name, args.device_id, args.volume_backend_name,
+                                args.usage, args.nova_aggregate_id, args.status, detailed=False)
     columns = ['id', 'storage_name', 'device_id', 'usage', 'nova_aggregate_id',
-               'user_id', 'created_at', 'updated_at']
+               'user_id', 'created_at', 'updated_at', 'status']
     utils.print_list(storages, columns)
 
 
