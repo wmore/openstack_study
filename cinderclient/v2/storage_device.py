@@ -26,8 +26,24 @@ class StorageDevice(base.Resource):
 class StorageDeviceManager(base.Manager):
     resource_class = StorageDevice
 
-    def list(self, device_name=''):
-        devices = self._list("/os-storage-device?device_name=%s" % device_name, 'devices')
+    def list(self, device_name=None, device_type_id=None, protocol=None, use_driver=None, controller_ip=None):
+
+        url = '/os-storage-device'
+        filters = []
+        if device_name:
+            filters.append('device_name={0}'.format(device_name))
+        if device_type_id:
+            filters.append('device_type_id={0}'.format(device_type_id))
+        if protocol:
+            filters.append('protocol={0}'.format(protocol))
+        if use_driver is not None:
+            filters.append('use_driver={0}'.format(str(use_driver).lower()))
+        if controller_ip:
+            filters.append('controller_ip={0}'.format(controller_ip))
+        if len(filters) > 0:
+            str_filters = '&'.join(filters)
+            url = url + '?' + str_filters
+        devices = self._list(url, 'devices')
         return devices
 
     def get(self, type_id):

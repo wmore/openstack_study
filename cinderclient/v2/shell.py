@@ -2806,10 +2806,27 @@ def do_storage_device_update(cs, args):
 @utils.arg('--device_name',
            metavar='<device_name>',
            default='',
-           help='Name of new storage device.')
+           help='Name of storage device. Support fuzzy query.')
+@utils.arg('--device_type_id',
+           metavar='<device_type_id>',
+           default='',
+           help='Device type id of storage device.')
+@utils.arg('--protocol',
+           metavar='<protocol>',
+           default='',
+           help='Protocol of storage device.')
+@utils.arg('--controller_ip',
+           metavar='<controller_ip>',
+           default='',
+           help='Controller ip of storage device.')
+@utils.arg('--use_driver',
+           metavar='<use_driver>',
+           default='',
+           help='User driver or not.')
 def do_storage_device_list(cs, args):
     """Show all storage devices."""
-    devices = cs.storage_device.list(args.device_name)
+    devices = cs.storage_device.list(args.device_name, args.device_type_id,
+                                     args.protocol, args.use_driver, args.controller_ip)
     utils.print_list(devices,
                      ['id', 'device_name', 'device_type_id', 'protocol',
                       'use_driver', 'controller_ip', 'user_name', 'password'])
