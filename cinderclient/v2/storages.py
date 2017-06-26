@@ -88,3 +88,13 @@ class StoragesManager(base.Manager):
     def reconfig(self, storage_id):
         resp, body = self.api.client.get("/storages/%s/reconfig" % storage_id)
         return body
+
+    def get_count_volume_group_type(self, volume_type_ids):
+        url = 'os-volume-amount'
+        import pdb
+        pdb.set_trace()
+        if volume_type_ids:
+            volume_type_ids_str = ','.join(volume_type_ids)
+            url = url + '?volume_type_ids=' + volume_type_ids_str
+        result = self._list(url, 'volume_amount')
+        return result

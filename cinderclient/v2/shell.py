@@ -2856,3 +2856,11 @@ def do_storage_device_delete(cs, args):
             print("Delete for storage device %s failed: %s" % (device, e))
     if failure_count == len(args.devices):
         raise exceptions.CommandError("Unable to delete any of the specified storage device.")
+
+
+@utils.arg('volume_types',
+           metavar='<volume_types>', nargs='+',
+           help='ID of storage device type or device types to query.')
+def do_volume_amount(cs, args):
+    result = cs.storages.get_count_volume_group_type(args.volume_types)
+    utils.print_list(result, ['volume_type_id', 'amount'])
