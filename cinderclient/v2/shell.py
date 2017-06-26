@@ -2860,7 +2860,7 @@ def do_storage_device_delete(cs, args):
 
 @utils.arg('volume_types',
            metavar='<volume_types>', nargs='+',
-           help='ID of storage device type or device types to query.')
+           help='ID of volume type or volume types to query.')
 def do_volume_amount(cs, args):
     result = cs.storages.get_count_volume_group_type(args.volume_types)
     utils.print_list(result, ['volume_type_id', 'amount'])

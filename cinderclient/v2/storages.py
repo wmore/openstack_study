@@ -91,8 +91,6 @@ class StoragesManager(base.Manager):
 
     def get_count_volume_group_type(self, volume_type_ids):
         url = 'os-volume-amount'
-        import pdb
-        pdb.set_trace()
         if volume_type_ids:
             volume_type_ids_str = ','.join(volume_type_ids)
             url = url + '?volume_type_ids=' + volume_type_ids_str
