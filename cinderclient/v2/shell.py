@@ -2770,19 +2770,21 @@ def do_storage_device_create(cs, args):
            help='Id of storage device')
 @utils.arg('--device_name',
            metavar='<device_name>',
+           default=None,
            help='Name of new storage device.')
-@utils.arg('--device_type_id',
-           metavar='<device_type_id>',
-           help='Type of new storage device.')
+# @utils.arg('--device_type_id',
+#            metavar='<device_type_id>',
+#            default=None,
+#            help='Type of new storage device.')
 @utils.arg('--use_driver',
            metavar='<use_driver>',
            type=bool,
-           default=False,
-           help='User driver or not.')
-@utils.arg('--protocol',
-           metavar='<protocol>',
            default=None,
-           help='The protocol of new storage device.')
+           help='User driver or not.')
+# @utils.arg('--protocol',
+#            metavar='<protocol>',
+#            default=None,
+#            help='The protocol of new storage device.')
 @utils.arg('--controller_ip',
            metavar='<controller_ip>',
            default=None,
@@ -2797,8 +2799,7 @@ def do_storage_device_create(cs, args):
            help='The password of new storage device.')
 def do_storage_device_update(cs, args):
     """update a storage device"""
-    device = cs.storage_device.update(args.id, args.device_name, args.device_type_id, args.protocol,
-                                      args.use_driver, args.controller_ip, args.user_name,
+    device = cs.storage_device.update(args.id, args.device_name, args.use_driver, args.controller_ip, args.user_name,
                                       args.password)
     utils.print_dict(device._info)
 
@@ -2829,7 +2830,7 @@ def do_storage_device_list(cs, args):
                                      args.protocol, args.use_driver, args.controller_ip)
     utils.print_list(devices,
                      ['id', 'device_name', 'device_type_id', 'protocol',
-                      'use_driver', 'controller_ip', 'user_name', 'password'])
+                      'use_driver', 'controller_ip', 'user_name', 'password', 'status'])
 
 
 @utils.arg('id',
@@ -2862,5 +2863,18 @@ def do_storage_device_delete(cs, args):
            metavar='<volume_types>', nargs='+',
            help='ID of volume type or volume types to query.')
 def do_volume_amount(cs, args):
+    """Count volumes by volume_type."""
     result = cs.storages.get_count_volume_group_type(args.volume_types)
     utils.print_list(result, ['volume_type_id', 'amount'])
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help='ID of storage device to reconfig.')
+def do_storage_device_reconfig(cs, args):
+    """Set the configuration of volume storage and restart kolla container."""
+    try:
+        cs.storage_device.reconfig(args.id)
+        print("Request to reconfig storage of device %s has been accepted." % (args.id))
+    except Exception as e:
+        print("Reconfig for storage of device %s failed: %s" % (args.id, e))

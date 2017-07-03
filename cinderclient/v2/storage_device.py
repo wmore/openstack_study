@@ -70,17 +70,18 @@ class StorageDeviceManager(base.Manager):
 
         return self._create("/os-storage-device", body, "device")
 
-    def update(self, device_id, device_name, device_type_id, protocol, use_driver=False, controller_ip=None,
+    def update(self, device_id, device_name=None, use_driver=None, controller_ip=None,
                user_name=None, password=None):
         body = {
             "device": {
-                "device_name": device_name,
-                "device_type_id": device_type_id,
-                "protocol": protocol,
-                "use_driver": use_driver
+                # "device_type_id": device_type_id,
+                # "protocol": protocol,
             }
         }
-
+        if use_driver is not None:
+            body['device']['use_driver'] = use_driver
+        if device_name is not None:
+            body['device']['device_name'] = device_name
         if controller_ip is not None:
             body['device']['controller_ip'] = controller_ip
         if user_name is not None:
@@ -93,3 +94,7 @@ class StorageDeviceManager(base.Manager):
 
     def delete(self, device_id):
         return self._delete("/os-storage-device/%s" % device_id)
+
+    def reconfig(self, device_id):
+        resp, body = self.api.client.get("/os-storage-device/%s/reconfig" % device_id)
+        return body
