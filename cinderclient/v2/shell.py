@@ -2729,6 +2729,17 @@ def do_storage_reconfig(cs, args):
     except Exception as e:
         print("Reconfig for storage %s failed: %s" % (args.id, e))
 
+@utils.arg('storages',
+           metavar='<storages>', nargs='+',
+           help='ID of storage or storages to reconfig.')
+def do_storage_reconfig_batch(cs, args):
+    """Set the configuration of volume storage and restart kolla container."""
+    try:
+        cs.storages.reconfig_batch(args.storages)
+        print("Request to reconfig storage %s has been accepted." % (args.storages))
+    except Exception as e:
+        print("Reconfig for storage %s failed: %s" % (args.storages, e))
+
 
 @utils.arg('--device_name',
            metavar='<device_name>',

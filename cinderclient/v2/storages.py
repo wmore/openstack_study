@@ -36,7 +36,7 @@ class StoragesManager(base.Manager):
         if device_id:
             filters.append('device_id={0}'.format(device_id))
         if volume_backend_name:
-            filters.append('volume_backend_name={0}'.volume_backend_name(storage_name))
+            filters.append('volume_backend_name={0}'.format(storage_name))
         if usage:
             filters.append('usage={0}'.format(usage))
         if nova_aggregate_id:
@@ -96,3 +96,8 @@ class StoragesManager(base.Manager):
             url = url + '?volume_type_ids=' + volume_type_ids_str
         result = self._list(url, 'volume_amount')
         return result
+
+    def reconfig_batch(self, storage_ids):
+        id_str = ','.join(storage_ids)
+        resp, body = self.api.client.get("/storages/reconfig_batch?storage_ids=%s" % id_str)
+        return body
