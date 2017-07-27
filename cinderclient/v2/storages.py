@@ -28,7 +28,7 @@ class StoragesManager(base.Manager):
 
     def list(self, storage_name=None, device_id=None,
              volume_backend_name=None, usage=None, nova_aggregate_id=None,
-             status=None, detailed=False):
+             status=None, detailed=False, project_ids=None):
         url = '/storages'
         filters = []
         if storage_name:
@@ -43,8 +43,11 @@ class StoragesManager(base.Manager):
             filters.append('nova_aggregate_id={0}'.format(nova_aggregate_id))
         if status:
             filters.append('status={0}'.format(status))
+        if project_ids:
+            filters.append('project_ids={0}'.format(','.join(project_ids)))
         if detailed is True:
             filters.append('detail=true')
+
         if len(filters) > 0:
             str_filters = '&'.join(filters)
             url = url + '?' + str_filters
@@ -101,3 +104,55 @@ class StoragesManager(base.Manager):
         id_str = ','.join(storage_ids)
         resp, body = self.api.client.get("/storages/reconfig_batch?storage_ids=%s" % id_str)
         return body
+
+    def get_hosts(self, storage_id):
+        url = '/storages/%s/hosts' % storage_id
+        result = self._list(url, 'hosts')
+        return result
+
+    def post_host(self, storage_id, opt_node, opt_aggregate_id):
+        url = '/storages/%s/hosts' % storage_id
+        body = {
+            "host": {
+                "opt_node": opt_node,
+                "opt_aggregate_id": opt_aggregate_id
+            }
+        }
+        return self._create(url, body, 'host')
+
+    def delete_host(self, storage_id, opt_node, opt_aggregate_id):
+        url = '/storages/%s/hosts/%s?opt_aggregate_id=%s' % (storage_id, opt_node, opt_aggregate_id)
+        return self._delete(url)
+
+    def create_storage_project(self, storage_id_list, project_id):
+        url = '/os-storage-project'
+
+        body = {
+            "storage_projects": [
+            ]
+        }
+
+        for s in storage_id_list:
+            body['storage_projects'].append({
+                "project_id": project_id,
+                "storage_id": s
+            })
+
+        self.run_hooks('modify_body_for_create', body)
+        resp, body = self.api.client.post(url, body=body)
+        return body['storage_projects']
+
+    def update_storage_project(self, storage_id_list, project_id):
+        url = '/os-storage-project/%s' % project_id
+
+        body = {
+            "storage_ids": storage_id_list
+        }
+
+        self.run_hooks('modify_body_for_update', body)
+        resp, body = self.api.client.put(url, body=body)
+        return body
+
+    def delete_storage_project(self, project_id, storage_id):
+        url = '/os-storage-project/%s?storage_id=%s' % (project_id, storage_id)
+        return self._delete(url)

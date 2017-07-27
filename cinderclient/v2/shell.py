@@ -2874,7 +2874,7 @@ def do_storage_device_delete(cs, args):
            metavar='<volume_types>', nargs='+',
            help='ID of volume type or volume types to query.')
 def do_volume_amount(cs, args):
-    """Count volumes by volume_type."""
+    """Count volumes by volume_types."""
     result = cs.storages.get_count_volume_group_type(args.volume_types)
     utils.print_list(result, ['volume_type_id', 'amount'])
 
@@ -2889,3 +2889,116 @@ def do_storage_device_reconfig(cs, args):
         print("Request to reconfig storage of device %s has been accepted." % (args.id))
     except Exception as e:
         print("Reconfig for storage of device %s failed: %s" % (args.id, e))
+
+
+@utils.arg('project_id',
+           metavar='<project_id>',
+           help='ID of project.')
+def do_storage_amount(cs, args):
+    """Count storage quantity, total_capacity_gb, free_capacity_gb of protocol 'san' and 'nas'."""
+    result = cs.storage_device.amount(args.project_id)
+    utils.print_list(result, ['protocol', 'count', 'total_capacity_gb', 'free_capacity_gb'])
+
+
+@utils.arg('device_id',
+           metavar='<device_id>',
+           default=None,
+           help='ID of storage device.')
+def do_storage_device_protocols(cs, args):
+    """Get the protocol list by device_id."""
+    result = cs.storage_device.get_protocol(args.device_id)
+    utils.print_list(result, ['id', 'name'])
+
+
+@utils.arg('storage_id',
+           metavar='<storage_id>',
+           default=None,
+           help='ID of storage.')
+def do_storage_hosts(cs, args):
+    """Get the hosts relate storage."""
+    result = cs.storages.get_hosts(args.storage_id)
+    utils.print_list(result, ['id', 'volume_storage_id', 'opt_node', 'opt_node_ip', 'opt_aggregate_id', 'status',
+                              'user_id', 'created_at', 'deleted', 'deleted_at', 'err_msg', 'updated_at'])
+
+
+@utils.arg('storage_id',
+           metavar='<storage_id>',
+           help='ID of storage.')
+@utils.arg('--opt_node',
+           metavar='<opt_node>',
+           help='ID of operation node.')
+@utils.arg('--opt_aggregate_id',
+           metavar='<opt_aggregate_id>',
+           help='ID of operation aggregate.')
+def do_storage_host_create(cs, args):
+    """Create relation of storage and host."""
+    result = cs.storages.post_host(args.storage_id, args.opt_node, args.opt_aggregate_id)
+    utils.print_dict(result)
+
+
+@utils.arg('storage_id',
+           metavar='<storage_id>',
+           help='ID of storage.')
+@utils.arg('--opt_node',
+           metavar='<opt_node>',
+           help='ID of operation node.')
+@utils.arg('--opt_aggregate_id',
+           metavar='<opt_aggregate_id>',
+           help='ID of operation aggregate.')
+def do_storage_host_delete(cs, args):
+    """Delete relation of storage and host."""
+    try:
+        result = cs.storages.delete_host(args.storage_id, args.opt_node, args.opt_aggregate_id)
+        print("Request to delete relation of storage %s and host %s has been accepted." % (
+        args.storage_id, args.opt_node))
+    except Exception as e:
+        print("Delete relation failed: %s" % e)
+
+
+@utils.arg('project_id',
+           metavar='<project_id>',
+           help='ID of project.')
+@utils.arg('--storage_id',
+           metavar='<storage_id>',
+           nargs='+',
+           help='ID of storages.')
+def do_storage_project_create(cs, args):
+    """Create relation of storage and projects."""
+    result = cs.storages.create_storage_project(args.storage_id, args.project_id)
+    utils.print_list(result, ['project_id', 'storage_id'])
+
+
+@utils.arg('project_id',
+           metavar='<project_id>',
+           help='ID of project.')
+@utils.arg('--storage_id',
+           metavar='<storage_id>',
+           nargs='+',
+           help='ID of storages.')
+def do_storage_project_update(cs, args):
+    """Update relation of storage and projects."""
+    result = cs.storages.update_storage_project(args.storage_id, args.project_id)
+    result.update({'project_id': args.project_id})
+    utils.print_dict(result)
+
+
+@utils.arg('project_id',
+           metavar='<project_id>',
+           help='ID of project.')
+@utils.arg('--storage_id',
+           metavar='<storage_id>',
+           nargs='+',
+           help='ID of storages.')
+def do_storage_project_delete(cs, args):
+    """Delete relation of storage and projects."""
+    failure_count = 0
+    for s in args.storage_id:
+        try:
+            cs.storages.delete_storage_project(args.project_id, s)
+            print(
+                "Request to delete the relation of storage %s and project %s has been accepted." % (s, args.project_id))
+        except Exception as e:
+            failure_count += 1
+            print("Request to delete the relation of storage %s and project %s failed." % (s, args.project_id))
+    if failure_count == len(args.storage_id):
+        raise exceptions.CommandError("Unable to delete any of the specified storage_project.")

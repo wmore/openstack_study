@@ -98,3 +98,28 @@ class StorageDeviceManager(base.Manager):
     def reconfig(self, device_id):
         resp, body = self.api.client.get("/os-storage-device/%s/reconfig" % device_id)
         return body
+
+    def amount(self, project_id):
+        url = '/os-storage-device/amount'
+
+        if project_id:
+            url = url + '?project_id=' + project_id
+        amounts = []
+        resp, body = self.api.client.get(url)
+        #
+        # {u'nas': {u'count': 0, u'total_capacity_gb': 0, u'free_capacity_gb': 0},
+        #  u'san': {u'count': 0, u'total_capacity_gb': 0, u'free_capacity_gb': 0}}
+        # format to:
+        # [{u'count': 0, u'total_capacity_gb': 0, 'protocol': u'nas', u'free_capacity_gb': 0},
+        #  {u'count': 0, u'total_capacity_gb': 0, 'protocol': u'san', u'free_capacity_gb': 0}]
+        #
+        if body and len(body) > 0:
+            for k, v in body.items():
+                v.update({'protocol': k})
+                amounts.append(v)
+        return amounts
+
+    def get_protocol(self, type_id):
+        protocols = self._list("/os-storage-device-type/%s/get_protocol" % type_id, 'protocols')
+        return protocols
+
