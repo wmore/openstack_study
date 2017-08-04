@@ -45,7 +45,7 @@ from cinderclient.v2 import storages
 from cinderclient.v2 import storage_device
 from cinderclient.v2 import storage_metadata
 from cinderclient.v2 import storage_device_types
-
+from cinderclient.v2 import ruijie_volume
 
 class Client(object):
     """Top-level object to access the OpenStack Volume API.
@@ -109,6 +109,7 @@ class Client(object):
         self.storage_device_types = storage_device_types.StorageDeviceTypesManager(self)
         self.storage_metadata = storage_metadata.StorageMetadataManager(self)
         self.storage_device = storage_device.StorageDeviceManager(self)
+        self.ruijie_volume = ruijie_volume.RuijieVolumeManager(self)
 
         # Add in any extensions...
         if extensions:

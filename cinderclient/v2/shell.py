@@ -3002,3 +3002,26 @@ def do_storage_project_delete(cs, args):
             print("Request to delete the relation of storage %s and project %s failed." % (s, args.project_id))
     if failure_count == len(args.storage_id):
         raise exceptions.CommandError("Unable to delete any of the specified storage_project.")
+
+
+
+@utils.arg('volume_id',
+           metavar='<volume_id>',
+           help='ID of volume.')
+@utils.arg('--hostname',
+           metavar='<hostname>',
+           help='host name.')
+def do_ruijie_volume_attach(cs, args):
+    """Attach volume to host."""
+    result = cs.ruijie_volume.attach(args.volume_id, args.hostname)
+    utils.print_dict(result)
+
+
+
+@utils.arg('volume_id',
+           metavar='<volume_id>',
+           help='ID of volume.')
+def do_ruijie_volume_detach(cs, args):
+    """Detach volume to host."""
+    result = cs.ruijie_volume.detach(args.volume_id)
+    utils.print_dict(result)
