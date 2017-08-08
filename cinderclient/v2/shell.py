@@ -3025,3 +3025,18 @@ def do_ruijie_volume_detach(cs, args):
     """Detach volume to host."""
     result = cs.ruijie_volume.detach(args.volume_id)
     utils.print_dict(result)
+
+
+
+
+@utils.arg('volume_id',
+           metavar='<volume_id>',
+           help='ID of volume.')
+@utils.arg('project_id',
+           metavar='<project_id>',
+           help='ID of project.')
+def do_reset_volume_project(cs, args):
+    """Update the volume's project id."""
+    result = cs.ruijie_volume.update_volume_project(args.volume_id, args.project_id)
+    utils.print_dict(result)
+
