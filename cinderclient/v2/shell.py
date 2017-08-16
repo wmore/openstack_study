@@ -3024,7 +3024,10 @@ def do_ruijie_volume_attach(cs, args):
 def do_ruijie_volume_detach(cs, args):
     """Detach volume to host."""
     result = cs.ruijie_volume.detach(args.volume_id)
-    utils.print_dict(result)
+    if result:
+        utils.print_dict(result)
+    else:
+        print('Volume %s has not attach any host yet.' % args.volume_id)
 
 
 
