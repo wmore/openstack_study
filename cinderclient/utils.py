@@ -244,12 +244,13 @@ def find_resource(manager, name_or_id):
             resource = getattr(manager, 'resource_class', None)
             name_attr = resource.NAME_ATTR if resource else 'name'
             return manager.find(**{name_attr: name_or_id})
-        except exceptions.NotFound:
-            pass
-
-        # finally try to find entity by human_id
-        try:
-            return manager.find(human_id=name_or_id)
+        # NOTE: Don't try to find entity by human_id, curren cinderclient resource never define HUMAN_ID=TRUE.
+        # except exceptions.NotFound:
+        #     pass
+        #
+        # # finally try to find entity by human_id
+        # try:
+        #     return manager.find(human_id=name_or_id)
         except exceptions.NotFound:
             msg = "No %s with a name or ID of '%s' exists." % \
                 (manager.resource_class.__name__.lower(), name_or_id)
