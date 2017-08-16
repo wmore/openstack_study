@@ -27,7 +27,6 @@ class RuijieVolumeManager(VolumeManager):
         resp, body = self.api.client.post(url, body=body)
         return body
 
-
     def attach(self, volume, host_name=None):
         """Set attachment metadata.
 
@@ -38,27 +37,31 @@ class RuijieVolumeManager(VolumeManager):
         if host_name is not None:
             req_body = {'hostname': host_name}
         body = self._action('os-ruijie_volume_attach', volume, req_body)
-        result = {
-            'volume_id': volume,
-            'host_name': host_name,
-            'volume_device_path': body['device']['path']
-        }
+        if body.has_key('device') and body['device'].has_key('path'):
+            result = {
+                'volume_id': volume,
+                'host_name': host_name,
+                'volume_device_path': body['device']['path']
+            }
+        else:
+            result = body
         return result
 
     def detach(self, volume):
-        """Set attachment metadata.
+        """Set detachment metadata.
 
         :param volume: The :class:`Volume` (or its ID)
                        you would like to attach.
-        :param host_name: name of the attaching host.
         """
         body = self._action('os-ruijie_volume_detach', volume, {})
 
-        result = {
-            'volume_id': volume,
-            'volume_device_path': body['device']['path']
-        }
-
+        if body.has_key('device') and body['device'].has_key('path'):
+            result = {
+                'volume_id': volume,
+                'volume_device_path': body['device']['path']
+            }
+        else:
+            result = body
         return result
 
     def update_volume_project(self, volume_id, project_id):
