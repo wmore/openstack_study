@@ -16,7 +16,8 @@
 """Pools interface (v2 extension)"""
 
 from cinderclient import base
-
+from cinderclient import utils
+from six.moves.urllib import parse
 
 class Storages(base.Resource):
     def __repr__(self):
@@ -30,27 +31,28 @@ class StoragesManager(base.Manager):
              volume_backend_name=None, usage=None, nova_aggregate_id=None,
              status=None, detailed=False, project_ids=None):
         url = '/storages'
-        filters = []
+        filters = {}
         if storage_name:
-            filters.append('storage_name={0}'.format(storage_name))
+            filters['storage_name'] = storage_name
         if device_id:
-            filters.append('device_id={0}'.format(device_id))
+            filters['device_id'] = device_id
         if volume_backend_name:
-            filters.append('volume_backend_name={0}'.format(storage_name))
+            filters['volume_backend_name'] = volume_backend_name
         if usage:
-            filters.append('usage={0}'.format(usage))
+            filters['usage'] = usage
         if nova_aggregate_id:
-            filters.append('nova_aggregate_id={0}'.format(nova_aggregate_id))
+            filters['nova_aggregate_id'] = nova_aggregate_id
         if status:
-            filters.append('status={0}'.format(status))
-        if project_ids:
-            filters.append('project_ids={0}'.format(','.join(project_ids)))
+            filters['status'] = status
         if detailed is True:
-            filters.append('detail=true')
+            filters['detailed'] = 'true'
 
-        if len(filters) > 0:
-            str_filters = '&'.join(filters)
-            url = url + '?' + str_filters
+        filters = utils.unicode_key_value_to_string(filters)
+        if filters:
+            params = sorted(filters.items(), key=lambda x: x[0])
+            query_string = "?%s" % parse.urlencode(params)
+            url = url + query_string
+
         storages = self._list(url, 'storages')
         return storages
 
