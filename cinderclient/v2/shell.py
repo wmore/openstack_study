@@ -2873,9 +2873,14 @@ def do_storage_device_delete(cs, args):
 @utils.arg('volume_types',
            metavar='<volume_types>', nargs='+',
            help='ID of volume type or volume types to query.')
+@utils.arg('--status',
+           type=str,
+           metavar='<status>',
+           default=None,
+           help='Filtered by status of volume.Default:None.')
 def do_volume_amount(cs, args):
     """Count volumes by volume_types."""
-    result = cs.storages.get_count_volume_group_type(args.volume_types)
+    result = cs.storages.get_count_volume_group_type(args.volume_types, args.status)
     utils.print_list(result, ['volume_type_id', 'amount'])
 
 
@@ -2894,9 +2899,13 @@ def do_storage_device_reconfig(cs, args):
 @utils.arg('project_id',
            metavar='<project_id>',
            help='ID of project.')
+@utils.arg('--device_id',
+           metavar='<device_id>',
+           nargs='+',
+           help='ID of device.')
 def do_storage_amount(cs, args):
     """Count storage quantity, total_capacity_gb, free_capacity_gb of protocol 'san' and 'nas'."""
-    result = cs.storage_device.amount(args.project_id)
+    result = cs.storage_device.amount(args.project_id, args.device_id)
     utils.print_list(result, ['protocol', 'count', 'total_capacity_gb', 'free_capacity_gb'])
 
 
@@ -2914,45 +2923,22 @@ def do_storage_device_protocols(cs, args):
            metavar='<storage_id>',
            default=None,
            help='ID of storage.')
+@utils.arg('--nova_aggregate_id',
+           metavar='<id>',
+           default=None,
+           help='ID of nova aggregate.')
+@utils.arg('--nova_node_name',
+           metavar='<name>',
+           default=None,
+           help='Hostname of nova node.')
 def do_storage_hosts(cs, args):
     """Get the hosts relate storage."""
-    result = cs.storages.get_hosts(args.storage_id)
-    utils.print_list(result, ['id', 'volume_storage_id', 'opt_node', 'opt_node_ip', 'opt_aggregate_id', 'status',
-                              'user_id', 'created_at', 'deleted', 'deleted_at', 'err_msg', 'updated_at'])
+    result = cs.storages.get_hosts(args.storage_id, args.nova_aggregate_id, args.nova_node_name)
+    utils.print_list(result,
+                     ['hosts', 'id', 'volume_storage_id', 'status', 'opt_aggregate_id', 'opt_node', 'opt_node_ip',
+                      'err_msg', 'created_at', 'updated_at'])
 
 
-@utils.arg('storage_id',
-           metavar='<storage_id>',
-           help='ID of storage.')
-@utils.arg('--opt_node',
-           metavar='<opt_node>',
-           help='ID of operation node.')
-@utils.arg('--opt_aggregate_id',
-           metavar='<opt_aggregate_id>',
-           help='ID of operation aggregate.')
-def do_storage_host_create(cs, args):
-    """Create relation of storage and host."""
-    result = cs.storages.post_host(args.storage_id, args.opt_node, args.opt_aggregate_id)
-    utils.print_dict(result)
-
-
-@utils.arg('storage_id',
-           metavar='<storage_id>',
-           help='ID of storage.')
-@utils.arg('--opt_node',
-           metavar='<opt_node>',
-           help='ID of operation node.')
-@utils.arg('--opt_aggregate_id',
-           metavar='<opt_aggregate_id>',
-           help='ID of operation aggregate.')
-def do_storage_host_delete(cs, args):
-    """Delete relation of storage and host."""
-    try:
-        result = cs.storages.delete_host(args.storage_id, args.opt_node, args.opt_aggregate_id)
-        print("Request to delete relation of storage %s and host %s has been accepted." % (
-        args.storage_id, args.opt_node))
-    except Exception as e:
-        print("Delete relation failed: %s" % e)
 
 
 @utils.arg('project_id',

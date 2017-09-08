@@ -99,11 +99,14 @@ class StorageDeviceManager(base.Manager):
         resp, body = self.api.client.get("/os-storage-device/%s/reconfig" % device_id)
         return body
 
-    def amount(self, project_id):
+    def amount(self, project_id, device_ids):
         url = '/os-storage-device/amount'
 
         if project_id:
             url = url + '?project_id=' + project_id
+            if device_ids:
+                device_id_str = ','.join(device_ids)
+                url = url + '&device_id=' + device_id_str
         amounts = []
         resp, body = self.api.client.get(url)
         #

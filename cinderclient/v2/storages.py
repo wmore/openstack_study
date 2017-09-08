@@ -19,6 +19,7 @@ from cinderclient import base
 from cinderclient import utils
 from six.moves.urllib import parse
 
+
 class Storages(base.Resource):
     def __repr__(self):
         return "<Storages: %s>" % self.name
@@ -94,11 +95,14 @@ class StoragesManager(base.Manager):
         resp, body = self.api.client.get("/storages/%s/reconfig" % storage_id)
         return body
 
-    def get_count_volume_group_type(self, volume_type_ids):
+    def get_count_volume_group_type(self, volume_type_ids, status):
         url = 'os-volume-amount'
         if volume_type_ids:
             volume_type_ids_str = ','.join(volume_type_ids)
-            url = url + '?volume_type_ids=' + volume_type_ids_str
+            if status:
+                url = url + '?volume_type_ids=' + volume_type_ids_str + '&status=' + status
+            else:
+                url = url + '?volume_type_ids=' + volume_type_ids_str
         result = self._list(url, 'volume_amount')
         return result
 
@@ -107,24 +111,15 @@ class StoragesManager(base.Manager):
         resp, body = self.api.client.get("/storages/reconfig_batch?storage_ids=%s" % id_str)
         return body
 
-    def get_hosts(self, storage_id):
-        url = '/storages/%s/hosts' % storage_id
+    def get_hosts(self, storage_id, nova_aggregate_id, nova_node_name):
+        url = '/os-storage-host?storage_id=%s' % storage_id
+        if nova_aggregate_id:
+            url = url + '&nova_aggregate_id=' + nova_aggregate_id
+        if nova_node_name:
+            url = url + '&nova_node=' + nova_node_name
+
         result = self._list(url, 'hosts')
         return result
-
-    def post_host(self, storage_id, opt_node, opt_aggregate_id):
-        url = '/storages/%s/hosts' % storage_id
-        body = {
-            "host": {
-                "opt_node": opt_node,
-                "opt_aggregate_id": opt_aggregate_id
-            }
-        }
-        return self._create(url, body, 'host')
-
-    def delete_host(self, storage_id, opt_node, opt_aggregate_id):
-        url = '/storages/%s/hosts/%s?opt_aggregate_id=%s' % (storage_id, opt_node, opt_aggregate_id)
-        return self._delete(url)
 
     def create_storage_project(self, storage_id_list, project_id):
         url = '/os-storage-project'

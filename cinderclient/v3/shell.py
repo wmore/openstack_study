@@ -132,6 +132,18 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            nargs='?',
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
+@utils.arg('--max_size',
+           type=int,
+           dest='max_size',
+           nargs='?',
+           metavar='<size>',
+           help='limiting maximum size of volumes')
+@utils.arg('--min_size',
+           type=int,
+           dest='min_size',
+           nargs='?',
+           metavar='<size>',
+           help='limiting minimum size of volumes')
 def do_list(cs, args):
     """Lists all volumes."""
     # NOTE(thingee): Backwards-compatibility with v1 args
@@ -153,6 +165,8 @@ def do_list(cs, args):
                                                         type='image_metadata')
         if hasattr(args, 'image_metadata') and args.image_metadata else None,
         'group_id': getattr(args, 'group_id', None),
+        'max_size': args.max_size,
+        'min_size': args.min_size,
     }
 
     # If unavailable/non-existent fields are specified, these fields will
